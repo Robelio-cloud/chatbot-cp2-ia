@@ -255,26 +255,86 @@ for intent, v in intents.items():
 
 df = pd.DataFrame(rows)
 
-# Downloads (apenas na primeira execução)
-# Verifica individualmente cada recurso e baixa os que estiverem faltando.
-for resource in ['tokenizers/punkt', 'corpora/stopwords', 'corpora/wordnet']:
-    try:
-        nltk.data.find(resource)
-    except LookupError:
-        # o nome para download é a parte após a barra
-        nltk.download(resource.split('/')[-1])
+# Downloads (apenas na primeira execução) com verificações e fallbacks.
+# Tentamos baixar os recursos necessários; se falhar (por exemplo, sem internet),
+# o app usa alternativas robustas para não travar em produção.
+resource_checks = [
+    ('punkt', 'tokenizers/punkt'),
+    ('stopwords', 'corpora/stopwords'),
+    ('wordnet', 'corpora/wordnet'),
+    ('omw-1.4', 'corpora/omw-1.4')
+]
 
-stop_words = set(stopwords.words('portuguese'))
-lemmatizer = WordNetLemmatizer()
+have_punkt = False
+have_stopwords = False
+have_wordnet = False
+
+for name, path in resource_checks:
+    try:
+        nltk.data.find(path)
+        if name == 'punkt':
+            have_punkt = True
+        if name == 'stopwords':
+            have_stopwords = True
+        if name in ('wordnet', 'omw-1.4'):
+            have_wordnet = True
+    except LookupError:
+        try:
+            # quiet=True evita muita saída no deploy
+            nltk.download(name, quiet=True)
+            # Re-check
+            nltk.data.find(path)
+            if name == 'punkt':
+                have_punkt = True
+            if name == 'stopwords':
+                have_stopwords = True
+            if name in ('wordnet', 'omw-1.4'):
+                have_wordnet = True
+        except Exception:
+            # Se não for possível baixar, seguimos com fallback
+            pass
+
+# Stopwords (fallback vazio / pequeno conjunto se não houver recursos)
+if have_stopwords:
+    try:
+        stop_words = set(stopwords.words('portuguese'))
+    except Exception:
+        stop_words = set()
+else:
+    # Um pequeno conjunto de stopwords em português como fallback
+    stop_words = set([
+        'de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'é', 'com', 'não', 'uma',
+        'os', 'no', 'se', 'na', 'por', 'mais', 'as', 'dos', 'como', 'mas', 'foi', 'ao', 'ele'
+    ])
+
+# Lemmatizer (só será usado se wordnet estiver disponível)
+lemmatizer = None
+if have_wordnet:
+    try:
+        lemmatizer = WordNetLemmatizer()
+    except Exception:
+        lemmatizer = None
 
 
 def normalize_text(text):
     text = text.lower()
     text = re.sub(r'[%s]' % re.escape(string.punctuation), ' ', text)
-    tokens = nltk.word_tokenize(text)
+    # Tenta usar o tokenizador do NLTK (punkt). Se não estiver disponível,
+    # faz um tokenizador simples baseado em regex para evitar crash no deploy.
+    try:
+        # se punkt não foi encontrado, nltk.word_tokenize lançará LookupError
+        tokens = nltk.word_tokenize(text)
+    except LookupError:
+        tokens = re.findall(r"\b[\w']+\b", text, flags=re.UNICODE)
     tokens = [t for t in tokens if t.isalpha()]
     tokens = [t for t in tokens if t not in stop_words]
-    tokens = [lemmatizer.lemmatize(t) for t in tokens]
+    # Aplica lematização apenas se o lemmatizer estiver disponível
+    if lemmatizer is not None:
+        try:
+            tokens = [lemmatizer.lemmatize(t) for t in tokens]
+        except Exception:
+            # Se algo der errado na lematização, mantemos os tokens originais
+            pass
     return ' '.join(tokens)
 
 df['text_norm'] = df['text'].apply(normalize_text)
