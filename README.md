@@ -184,6 +184,12 @@ git push -u origin main
 
 **URL resultante:** `https://SEU_USUARIO-chatbot-cp2-ia-app-HASH.streamlit.app`
 
+## 🔗 Aplicação publicada
+
+A aplicação já está publicada no Streamlit Community Cloud e pode ser acessada publicamente neste link:
+
+- https://chatbot-cp2-ia-j3ulgljqfw7mwln9pafpuj.streamlit.app/
+
 ### 🚂 Opção 2: Railway (FÁCIL - GRATUITO)
 
 1. Acesse [railway.app](https://railway.app)
