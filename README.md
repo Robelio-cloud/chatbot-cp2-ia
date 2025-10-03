@@ -212,7 +212,7 @@ Para contribuir:
 
 ## 📜 Licença
 
-Este projeto é educacional e foi desenvolvido como parte do curso de Inteligência Artificial da FIAP por ROBELIO LOPES DA SILVA RM 556786.
+Este projeto é educacional e foi desenvolvido como parte do curso de Inteligência Artificial da FIAP.
 
 ---
 
