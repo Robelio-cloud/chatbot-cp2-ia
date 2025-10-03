@@ -184,7 +184,7 @@ git push -u origin main
 
 **URL resultante:** `https://SEU_USUARIO-chatbot-cp2-ia-app-HASH.streamlit.app`
 
-## 🔗 Aplicação publicada
+## 🔗 Aplicação publicada na Web.
 
 A aplicação já está publicada no Streamlit Community Cloud e pode ser acessada publicamente neste link:
 
