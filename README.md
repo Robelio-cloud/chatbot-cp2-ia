@@ -1,5 +1,7 @@
 # 🤘 RockStar Burger - Chatbot Inteligente
 
+![image](/images/chatbot-02.png)
+
 ## 🎸 Sobre o Projeto
 
 **RockStar Burger** é um chatbot inteligente para uma **lanchonete temática de Rock e Metal** que utiliza técnicas avançadas de Processamento de Linguagem Natural (NLP) para atender clientes de forma interativa e divertida.
