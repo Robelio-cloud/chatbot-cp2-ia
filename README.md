@@ -192,6 +192,8 @@ A aplicação já está publicada no Streamlit Community Cloud e pode ser acessa
 
 - https://chatbot-cp2-ia-j3ulgljqfw7mwln9pafpuj.streamlit.app/
 
+![image](/images/chatbot-01.png)
+
 ### 🚂 Opção 2: Railway (FÁCIL - GRATUITO)
 
 1. Acesse [railway.app](https://railway.app)
